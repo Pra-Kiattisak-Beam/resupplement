@@ -304,6 +304,45 @@
             updateCartUI();
             toggleCart();
         }
+        // --- ส่วนที่ 3: ระบบปัดนิ้ว (Swipe) สำหรับมือถือ ---
+        function setupSwipe(productKey) {
+            const imgElement = document.getElementById(`img-${productKey}`);
+            if (!imgElement) return;
+            
+            const sliderContainer = imgElement.parentElement; // อ้างอิงกรอบที่ครอบรูปอยู่
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            // เริ่มแตะหน้าจอ
+            sliderContainer.addEventListener('touchstart', function(event) {
+                touchStartX = event.changedTouches[0].screenX;
+            }, {passive: true});
+
+            // ปล่อยนิ้วจากหน้าจอ
+            sliderContainer.addEventListener('touchend', function(event) {
+                touchEndX = event.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+
+            // คำนวณทิศทางการปัด
+            function handleSwipe() {
+                const diffX = touchStartX - touchEndX;
+                // ตรวจสอบว่าเป็นการปัดนิ้วจริงๆ (ระยะทางมากกว่า 50 พิกเซล)
+                if (Math.abs(diffX) > 50) {
+                    if (diffX > 0) {
+                        // ปัดไปทางซ้าย -> เลื่อนไปรูปถัดไป
+                        changeImage(productKey, 1);
+                    } else {
+                        // ปัดไปทางขวา -> เลื่อนไปรูปก่อนหน้า
+                        changeImage(productKey, -1);
+                    }
+                }
+            }
+        }
+
+        // เปิดใช้งานระบบปัดนิ้วให้กับสินค้าทั้ง 2 แบบ
+        setupSwipe('sachet');
+        setupSwipe('box');
     </script>
 </body>
 </html>
